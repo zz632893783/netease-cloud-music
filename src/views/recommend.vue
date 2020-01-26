@@ -9,11 +9,12 @@
         </div>
         <h4 class="sectionTitle">推荐歌单</h4>
         <ul class="songList">
-            <li class="listItem" v-for="(item, index) in list" v-bind:key="index">
+            <li class="listItem" v-for="(item, index) in list" v-bind:key="index" v-on:click="viewDetail(item)">
                 <div class="cover" v-bind:style="`background-image: url(${item.picUrl});`"></div>
                 <p class="desc">{{item.name}}</p>
             </li>
         </ul>
+        <div class="nomore">已经到底了~</div>
     </div>
 </template>
 <script>
@@ -65,6 +66,14 @@ export default {
             this.swiperObj = new Swiper('.recommendBanner', {
                 autoplay: true,
                 loop: true
+            })
+        },
+        viewDetail: function (item) {
+            this.$router.push({
+                path: '/songListDetail',
+                query: {
+                    id: item.id
+                }
             })
         }
     },
@@ -123,6 +132,14 @@ export default {
                 -webkit-box-orient: vertical;
             }
         }
+    }
+    .nomore {
+        font-size: rem(14);
+        color: #666;
+        text-align: center;
+        // height: rem(40);
+        line-height: rem(40);
+        padding-bottom: rem(20);
     }
 }
 </style>
