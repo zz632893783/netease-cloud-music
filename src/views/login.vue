@@ -8,8 +8,8 @@
             </div>
             <span class="loginBtn" v-on:click="login">登录</span>
             <div class="otherLoginOption">
-                <span class="forgetPassword">忘记密码</span>
-                <span class="registry">注册</span>
+                <span class="forgetPassword" v-on:click="forgetPassword">忘记密码</span>
+                <span class="registry" v-on:click="registry">注册</span>
             </div>
         </div>
     </div>
@@ -28,24 +28,36 @@ export default {
     methods: {
         login: function () {
             if (!this.username) {
-                return console.log('手机号不能为空')
+                return alert('手机号不能为空')
             }
             if (!this.password) {
-                return console.log('密码不能为空')
+                return alert('密码不能为空')
             }
             let requestBody = {
-                phone: '18367806291',
-                password: '123qweasdzxc'
+                phone: this.username,
+                password: this.password
             }
+            this.$store.commit('setLoading', 1)
             commonRequest('/login/cellphone', requestBody).then(res => {
                 if (res.status === 200) {
+                    this.$store.commit('setLoading', -1)
                     setCookie('token', res.data.token)
                     setCookie('userId', res.data.userId)
                     setCookie('nickname', res.data.nickname)
+                    this.$router.push({
+                        path: '/home'
+                    })
                 }
             }).catch(error => {
+                this.$store.commit('setLoading', -1)
                 console.log(error)
             })
+        },
+        forgetPassword: function () {
+            return alert('忘记密码功能尚在开发中')
+        },
+        registry: function () {
+            return alert('注册功能尚在开发中')
         }
     }
 }

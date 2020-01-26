@@ -2,7 +2,7 @@
     <div id="app">
         <router-view/>
         <transition>
-            <div class="loading">
+            <div class="loading" v-show="$store.state.isLoading > 0">
                 <span></span>
                 <span></span>
             </div>
@@ -10,8 +10,8 @@
     </div>
 </template>
 <script>
-import commonRequest from '@/api/commonRequest.js'
-import { setCookie } from '@/tools/cookie.js'
+// import commonRequest from '@/api/commonRequest.js'
+// import { setCookie } from '@/tools/cookie.js'
 export default {
     components: {
     },
@@ -20,27 +20,28 @@ export default {
     },
     mounted: function () {
         this.setRem()
-        this.testRequest()
+        // this.testRequest()
+        // this.$store.commit('setLoading', 23333)
     },
     methods: {
         setRem: function () {
             document.documentElement.style.fontSize = `${window.innerWidth / 20}px`
-        },
-        testRequest: function () {
-            let requestBody = {
-                phone: '18367806291',
-                password: '123qweasdzxc'
-            }
-            commonRequest('/login/cellphone', requestBody).then(res => {
-                if (res.status === 200) {
-                    setCookie('token', res.data.token)
-                    setCookie('userId', res.data.userId)
-                    setCookie('nickname', res.data.nickname)
-                }
-            }).catch(error => {
-                console.log(error)
-            })
         }
+        // testRequest: function () {
+        //     let requestBody = {
+        //         phone: '18367806291',
+        //         password: '123qweasdzxc'
+        //     }
+        //     commonRequest('/login/cellphone', requestBody).then(res => {
+        //         if (res.status === 200) {
+        //             setCookie('token', res.data.token)
+        //             setCookie('userId', res.data.userId)
+        //             setCookie('nickname', res.data.nickname)
+        //         }
+        //     }).catch(error => {
+        //         console.log(error)
+        //     })
+        // }
     }
 }
 </script>
@@ -99,7 +100,7 @@ html, body {
         right: 0;
         bottom: 0;
         left: 0;
-        background-color: rgba(0, 0, 0, 0.1);
+        background-color: rgba(0, 0, 0, 0.2);
         span {
             position: absolute;
             left: 50%;
