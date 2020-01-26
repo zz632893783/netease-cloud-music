@@ -12,7 +12,7 @@ const routes = [{
     name: 'home',
     component: home,
     children: [{
-        path: 'recommend',
+        path: '/',
         name: 'recommend',
         component: recommend
     }]
