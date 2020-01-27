@@ -61,25 +61,25 @@ export default {
         left: 0;
         top: 0;
         right: 0;
-        height: rem(89);
+        height: rem(89 * 2);
         background-color: #d44339;
         .headRow {
-            height: rem(50);
-            line-height: rem(50);
+            height: rem(50 * 2);
+            line-height: rem(50 * 2);
             display: block;
             position: relative;
-            margin-bottom: rem(14);
+            margin-bottom: rem(14 * 2);
             .menuBtn {
                 position: absolute;
-                left: rem(11)
-                width: rem(18);
+                left: rem(11 * 2)
+                width: rem(18 * 2);
                 top: 50%;
                 transform: translate(0, -50%);
                 i {
                     display: block;
-                    height: rem(2);
+                    height: rem(2 * 2);
                     background-color: white;
-                    margin-bottom: rem(4);
+                    margin-bottom: rem(4 * 2);
                     &:nth-last-child(1) {
                         margin-bottom: 0;
                     }
@@ -90,17 +90,18 @@ export default {
                 width: 100%;
                 text-align: center;
                 color: white;
-                font-size: rem(18);
+                font-size: rem(18 * 2);
                 font-weight: 200;
             }
             .searchBtn {
                 position: absolute;
-                right: rem(11);
+                right: rem(11 * 2);
                 top: 50%;
                 transform: translate(0, -50%);
-                border: 1px solid white;
-                width: rem(22);
-                height: rem(22);
+                width: rem(22 * 2);
+                height: rem(22 * 2);
+                background-image: url('~@/assets/img/search.png');
+                background-size: 100% 100%;
             }
         }
         nav {
@@ -109,22 +110,23 @@ export default {
             .navItem {
                 display: inline-block;
                 width: 33.33%;
-                line-height: rem(12);
+                line-height: rem(12 * 2);
                 text-align: center;
                 span {
                     position: relative;
                     color: white;
                     font-weight: 200;
-                    font-size: rem(12);
+                    // font-size: rem(12 * 2);
+                    font-size: rem(27);
                     &:before {
                         content: '';
                         position: absolute;
                         left: 0;
                         right: 0;
                         bottom: 0;
-                        height: rem(2);
+                        height: rem(2 * 2);
                         background-color: white;
-                        transform: translate(0, rem(6));
+                        transform: translate(0, rem(6 * 2));
                         display: none;
                     }
                 }
@@ -141,7 +143,7 @@ export default {
     }
     >.section {
         position: absolute;
-        top: rem(89);
+        top: rem(89 * 2);
         right: 0;
         bottom: 0;
         left: rem(0);

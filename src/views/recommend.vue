@@ -89,43 +89,43 @@ export default {
 @import '~@/style/index.styl'
 .recommend {
     .recommendBanner {
-        height: rem(160);
+        height: rem(160 * 2);
         display: block;
         .cover {
-            width: rem(400);
-            height: rem(160);
+            width: rem(400 * 2);
+            height: rem(160 * 2);
             background-size: cover;
             background-position: 50% 50%;
         }
     }
     .sectionTitle {
-        height: rem(60);
-        line-height: rem(60);
-        padding-left: rem(4);
-        font-size: rem(12);
+        height: rem(60 * 2);
+        line-height: rem(60 * 2);
+        padding-left: rem(4 * 2);
+        font-size: rem(29);
     }
     .songList {
         margin: 0 rem(10);
         font-size: 0;
         .listItem {
             display: inline-block;
-            width: rem(120);
-            margin-right: rem(10);
+            width: rem(230);
+            margin-right: rem(10 * 2);
             &:nth-child(3n) {
                 margin-right: 0;
             }
             .cover {
                 display: block;
-                width: rem(120);
-                height: rem(120);
+                width: rem(230);
+                height: rem(230);
                 border-radius: rem(4);
                 background-size: cover;
                 background-position: 50% 50%;
             }
             .desc {
-                height: rem(52);
-                line-height: rem(16);
-                font-size: rem(12);
+                height: rem(52 * 2);
+                line-height: rem(16 * 2);
+                font-size: rem(12 * 2);
                 color: #2e3030;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -136,12 +136,12 @@ export default {
         }
     }
     .nomore {
-        font-size: rem(14);
+        font-size: rem(14 * 2);
         color: #666;
         text-align: center;
         // height: rem(40);
-        line-height: rem(40);
-        padding-bottom: rem(20);
+        line-height: rem(40 * 2);
+        padding-bottom: rem(20 * 2);
     }
 }
 </style>

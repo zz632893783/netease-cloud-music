@@ -71,54 +71,54 @@ export default {
     background-color: #dc2c1f;
     .logo {
         position: absolute;
-        width: rem(75);
-        height: rem(75);
+        width: rem(2 * 75);
+        height: rem(2 * 75);
         border-radius: 50%;
         background-size: 100% 100%;
         background-image: url('~@/assets/img/logo.png');
         left: 50%;
-        top: rem(100);
+        top: rem(2 * 100);
         transform: translate(-50%);
     }
     .loginBox {
         position: absolute;
         left: 50%;
-        top: rem(250);
+        top: rem(2 * 250);
         transform: translate(-50%, 0);
         .passwordOuter {
-            margin-bottom: rem(16);
+            margin-bottom: rem(2 * 16);
         }
         .username {
-            margin-bottom: rem(16);
+            margin-bottom: rem(2 * 16);
         }
         .username, .password {
-            line-height: rem(43);
-            height: rem(43);
-            width: rem(260);
-            border-radius: rem(22.5);
+            line-height: rem(2 * 43);
+            height: rem(2 * 43);
+            width: rem(2 * 260);
+            border-radius: rem(2 * 22.5);
             border: none;
             display: block;
             outline: none;
-            font-size: rem(17);
-            padding: 0 rem(10);
+            font-size: rem(2 * 17);
+            padding: 0 rem(2 * 10);
         }
         .loginBtn {
-            margin-bottom: rem(16);
+            margin-bottom: rem(2 * 16);
             display: block;
-            line-height: rem(43);
-            height: rem(43);
-            border: rem(0.7) solid #e66b63;
+            line-height: rem(2 * 43);
+            height: rem(2 * 43);
+            border: rem(2 * 0.7) solid #e66b63;
             text-align: center;
-            font-size: rem(17);
+            font-size: rem(2 * 17);
             color: white;
-            border-radius: rem(22.5);
-            margin-bottom: rem(16);
+            border-radius: rem(2 * 22.5);
+            margin-bottom: rem(2 * 16);
         }
         .otherLoginOption {
             font-size: 0;
             text-align: center;
             .forgetPassword, .registry {
-                font-size: rem(17);
+                font-size: rem(2 * 17);
                 color: white;
                 width: 35%;
                 display: inline-block;
