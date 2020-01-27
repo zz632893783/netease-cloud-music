@@ -4,6 +4,8 @@ import home from '../views/home.vue'
 import login from '../views/login.vue'
 import recommend from '../views/recommend.vue'
 import songListDetail from '../views/songListDetail'
+import singer from '../views/singer'
+import rank from '../views/rank'
 
 Vue.use(VueRouter)
 
@@ -15,6 +17,14 @@ const routes = [{
         path: '/',
         name: 'recommend',
         component: recommend
+    }, {
+        path: 'singer',
+        name: 'singer',
+        component: singer
+    }, {
+        path: 'rank',
+        name: 'rank',
+        component: rank
     }]
 }, {
     path: '/login',

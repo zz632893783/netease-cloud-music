@@ -45,6 +45,10 @@ export default {
     methods: {
         setActiveNav: function (index) {
             this.activeNavIndex = index
+            let path = ['/home', '/home/singer', '/home/rank'][index]
+            this.$router.push({
+                path
+            })
         }
     }
 }
