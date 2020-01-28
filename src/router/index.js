@@ -6,6 +6,7 @@ import recommend from '../views/recommend.vue'
 import songListDetail from '../views/songListDetail'
 import singer from '../views/singer'
 import rank from '../views/rank'
+import singerDetail from '../views/singerDetail'
 
 Vue.use(VueRouter)
 
@@ -34,6 +35,10 @@ const routes = [{
     path: '/songListDetail',
     name: 'songListDetail',
     component: songListDetail
+}, {
+    path: '/singerDetail',
+    name: 'singerDetail',
+    component: singerDetail
 }]
 
 const router = new VueRouter({

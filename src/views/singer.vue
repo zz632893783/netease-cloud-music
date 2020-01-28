@@ -9,7 +9,7 @@
             <span v-bind:class="`item${queryBody.initials === String.fromCharCode(96 + index) ? ' active' : ''}`" v-for="index in 26" v-bind:key="index" v-on:click="setInitials(String.fromCharCode(96 + index))">{{String.fromCharCode(96 + index).toUpperCase()}}</span>
         </div>
         <div class="sinterList" ref="sinterList" v-on:scroll="scrollFunc">
-            <div class="item" v-for="(item, index) in singerList" v-bind:key="index">
+            <div class="item" v-for="(item, index) in singerList" v-bind:key="index" v-on:click="viewSingerDetail(item)">
                 <div class="avatar" v-bind:style="`background-image: url(${item.img1v1Url});`"></div>
                 <span class="name">{{item.name}}</span>
             </div>
@@ -121,6 +121,14 @@ export default {
                 this.queryBody.offset = this.queryBody.offset + this.queryBody.pageSize
                 this.querySingers()
             }
+        },
+        viewSingerDetail: function (obj) {
+            this.$router.push({
+                path: '/singerDetail',
+                query: {
+                    id: obj.id
+                }
+            })
         }
     },
     mounted: function () {
