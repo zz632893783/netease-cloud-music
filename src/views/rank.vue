@@ -2,7 +2,7 @@
     <div class="rank">
         <h4 class="sectionTitle">官方榜</h4>
         <div class="officialRank">
-            <div class="item" v-for="(item, index) in officialRank" v-bind:key="index">
+            <div class="item" v-for="(item, index) in officialRank" v-bind:key="index" v-on:click="viewDetail(item.id)">
                 <div class="cover" v-bind:style="`background-image: url(${item.imgUrl});`">
                     <span class="updateFrequency">{{item.updateFrequency}}</span>
                 </div>
@@ -13,7 +13,7 @@
         </div>
         <h4 class="sectionTitle">全球榜</h4>
         <div class="globalRank">
-            <div class="item" v-for="(item, index) in globalRank" v-bind:key="index">
+            <div class="item" v-for="(item, index) in globalRank" v-bind:key="index" v-on:click="viewDetail(item.id)">
                 <div class="cover" v-bind:style="`background-image: url(${item.coverImgUrl});`">
                     <span class="updateFrequency">{{item.updateFrequency}}</span>
                 </div>
@@ -67,7 +67,7 @@ export default {
                         this.$store.commit('setLoading', -1)
                         if (res.status === 200) {
                             item.imgUrl = res.data.playlist.coverImgUrl
-                            console.log(res.data)
+                            item.id = res.data.playlist.id
                             item.updateFrequency = res.data.playlist.updateFrequency
                             item.songs = (res.data.playlist.tracks || []).splice(0, 3)
                             resolve()
@@ -95,6 +95,14 @@ export default {
             }).catch(error => {
                 console.log(error)
                 this.$store.commit('setLoading', -1)
+            })
+        },
+        viewDetail: function (id) {
+            this.$router.push({
+                path: '/songListDetail',
+                query: {
+                    id
+                }
             })
         }
     },
