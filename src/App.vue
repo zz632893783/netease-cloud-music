@@ -7,13 +7,18 @@
                 <span></span>
             </div>
         </transition>
+        <div class="playerContainer">
+            <player></player>
+        </div>
     </div>
 </template>
 <script>
 // import commonRequest from '@/api/commonRequest.js'
 // import { setCookie } from '@/tools/cookie.js'
+import player from '@/views/player.vue'
 export default {
     components: {
+        player
     },
     data: function () {
         return {}
@@ -121,6 +126,14 @@ html, body {
                 animation: flash02 linear 2s infinite;
             }
         }
+    }
+    .playerContainer {
+        position: absolute;
+        height: rem(136);
+        left: 0;
+        bottom: 0;
+        right: 0;
+        box-shadow: 0 rem(-5) rem(15) rgba(0, 0, 0, 0.1);
     }
 }
 * {
