@@ -17,7 +17,7 @@
                     <div class="btn"></div>
                     <span class="text">播放热门{{hotSongs.length}}</span>
                 </div>
-                <div class="item" v-for="(item, index) in hotSongs" v-bind:key="index">
+                <div class="item" v-for="(item, index) in hotSongs" v-bind:key="index" v-on:click="playMusic(item)">
                     <span class="num">{{index + 1}}</span>
                     <div class="song">
                         <span class="name">{{item.name}}</span>
@@ -70,6 +70,10 @@ export default {
         },
         back: function () {
             this.$router.back()
+        },
+        playMusic: function (obj) {
+            this.$parent.$refs.player.getMusicDetail(obj.id)
+            this.$parent.$refs.player.getSongURL(obj.id)
         }
     },
     mounted: function () {

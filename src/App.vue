@@ -8,7 +8,7 @@
             </div>
         </transition>
         <div class="playerContainer">
-            <player></player>
+            <player ref="player"></player>
         </div>
     </div>
 </template>

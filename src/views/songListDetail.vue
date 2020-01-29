@@ -38,7 +38,7 @@
                 </ul>
             </div>
             <ul class="songList" ref="songList" v-bind:style="`height: ${computeSongListMaxHeight()}px; overflow-y: ${flag ? 'auto' : 'hidden'};`">
-                <li class="songItem" v-for="(item, index) in songList" v-bind:key="index">
+                <li class="songItem" v-for="(item, index) in songList" v-bind:key="index" v-on:click="playMusic(item)">
                     <span class="rank">{{index + 1}}</span>
                     <div class="songInfo">
                         <p class="name">{{item.name}}</p>
@@ -130,6 +130,12 @@ export default {
         },
         back: function () {
             this.$router.back()
+        },
+        playMusic: function (obj) {
+            // console.log(obj.id, this.$parent.$refs.player)
+            this.$parent.$refs.player.getMusicDetail(obj.id)
+            this.$parent.$refs.player.getSongURL(obj.id)
+            // this.$parent.$refs.player.setStatus('pause')
         }
     },
     mounted: function () {

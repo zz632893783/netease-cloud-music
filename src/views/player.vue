@@ -5,8 +5,8 @@
         <div class="preview">
             <div v-bind:class="`cover ${status}`" v-bind:style="`background-image: url(${coverUrl});`"></div>
             <div class="info">
-                <p class="name">富士山下</p>
-                <p class="singer">陈奕迅</p>
+                <p class="name">{{songName}}</p>
+                <p class="singer">{{artist}}</p>
             </div>
             <span v-bind:class="`btn ${status}`" v-on:click="clickPlayerBtn">
                 <canvas v-bind:width="canvasSize" v-bind:height="canvasSize" ref="progress"></canvas>
@@ -23,15 +23,21 @@ export default {
             msg: 'player',
             musicUrl: '',
             status: 'pause',
+            loadFinish: false,
             // status: 'play',
             timer: null,
             duration: 0,
             canvasSize: 0,
             ctx: null,
-            coverUrl: ''
+            coverUrl: '',
+            songName: '',
+            artist: ''
         }
     },
     methods: {
+        setStatus: function (status) {
+            this.status = status
+        },
         getSongURL: function (id) {
             let requestBody = {
                 id
@@ -47,9 +53,14 @@ export default {
                 console.log(error)
             })
         },
+        setLoadFinishStatus: function (status) {
+            this.loadFinish = status
+        },
         clickPlayerBtn: function () {
-            // window.testAudio = this.$refs.audio
-            // duration
+            if (!this.loadFinish) {
+                return alert('请等待音乐加载完成')
+            }
+            // this.loadFinish = false
             if (this.status === 'pause') {
                 this.status = 'play'
                 this.$refs.audio.play()
@@ -61,12 +72,11 @@ export default {
         setTimer: function () {
             this.timer && (clearInterval(this.timer))
             this.timer = setInterval(() => {
-                // console.log(this.$refs.audio.currentTime / this.$refs.audio.duration)
                 this.draw()
             }, 100)
         },
-        loadMusic: function () {
-            // console.log('loadMusic', this.$refs.audio.duration)
+        loadFunc: function () {
+            // console.log('loadFunc finish')
         },
         computeCanvasSize: function () {
             this.canvasSize = 64 * window.innerWidth / 750
@@ -94,6 +104,8 @@ export default {
                 if (res.status === 200) {
                     this.$store.commit('setLoading', -1)
                     this.coverUrl = res.data.songs[0].al.picUrl
+                    this.songName = res.data.songs[0].name
+                    this.artist = res.data.songs[0].ar.map(item => item.name).join(',')
                 }
             }).catch(error => {
                 this.$store.commit('setLoading', -1)
@@ -102,11 +114,22 @@ export default {
         }
     },
     mounted: function () {
-        this.getMusicDetail('65766')
-        this.getSongURL('65766')
+        // this.getMusicDetail('65766')
+        // this.getSongURL('65766')
         this.setTimer()
         this.computeCanvasSize()
         this.ctx = this.$refs.progress.getContext('2d')
+        this.$refs.audio.addEventListener('canplay', () => {
+            this.loadFinish = true
+            this.status = 'pause'
+            this.clickPlayerBtn()
+        })
+    },
+    beforeUpdate: function () {
+        // this.timer && (clearInterval(this.timer))
+    },
+    beforeDestroy: function () {
+        this.timer && (clearInterval(this.timer))
     }
 }
 </script>
