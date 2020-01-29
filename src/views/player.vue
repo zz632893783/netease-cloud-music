@@ -1,6 +1,6 @@
 <template>
-    <div class="player">
-        <!-- <audio ref="audio" v-bind:src="musicUrl" v-on:load="loadMusic"></audio> -->
+    <div class="player" v-show="show">
+        <div class="container"></div>
         <audio ref="audio" v-bind:src="musicUrl"></audio>
         <div class="preview">
             <div v-bind:class="`cover ${status}`" v-bind:style="`background-image: url(${coverUrl});`"></div>
@@ -31,7 +31,8 @@ export default {
             ctx: null,
             coverUrl: '',
             songName: '',
-            artist: ''
+            artist: '',
+            show: true
         }
     },
     methods: {
@@ -85,12 +86,12 @@ export default {
             this.ctx.clearRect(0, 0, this.canvasSize, this.canvasSize)
             this.ctx.lineWidth = 6 * window.innerWidth / 750
             this.ctx.beginPath()
-            this.ctx.arc(this.canvasSize / 2, this.canvasSize / 2, this.canvasSize / 2 - this.ctx.lineWidth / 2, 0, 2 * Math.PI)
+            this.ctx.arc(this.canvasSize / 2, this.canvasSize / 2, this.canvasSize / 2 - this.ctx.lineWidth, 0, 2 * Math.PI)
             this.ctx.strokeStyle = '#d4a49d'
             this.ctx.stroke()
             this.ctx.closePath()
             this.ctx.beginPath()
-            this.ctx.arc(this.canvasSize / 2, this.canvasSize / 2, this.canvasSize / 2 - this.ctx.lineWidth / 2, 0 - Math.PI / 2, this.$refs.audio.currentTime / this.$refs.audio.duration * 2 * Math.PI - Math.PI / 2)
+            this.ctx.arc(this.canvasSize / 2, this.canvasSize / 2, this.canvasSize / 2 - this.ctx.lineWidth, 0 - Math.PI / 2, this.$refs.audio.currentTime / this.$refs.audio.duration * 2 * Math.PI - Math.PI / 2)
             this.ctx.strokeStyle = '#d44339'
             this.ctx.stroke()
             this.ctx.closePath()
@@ -114,8 +115,7 @@ export default {
         }
     },
     mounted: function () {
-        // this.getMusicDetail('65766')
-        // this.getSongURL('65766')
+        this.show = this.$route.path !== '/search'
         this.setTimer()
         this.computeCanvasSize()
         this.ctx = this.$refs.progress.getContext('2d')
@@ -130,6 +130,11 @@ export default {
     },
     beforeDestroy: function () {
         this.timer && (clearInterval(this.timer))
+    },
+    watch: {
+        $route: function () {
+            this.show = this.$route.path !== '/search'
+        }
     }
 }
 </script>
@@ -144,6 +149,12 @@ export default {
     }
 }
 .player {
+    position: absolute;
+    height: rem(136);
+    left: 0;
+    bottom: 0;
+    right: 0;
+    box-shadow: 0 rem(-5) rem(15) rgba(0, 0, 0, 0.1);
     .preview {
         font-size: 0;
         position: absolute;

@@ -169,6 +169,12 @@ export default {
                 border: rem(2) solid #d44439;
             }
         }
+        &::-webkit-scrollbar {
+            // opacity: 0;
+            // background-color: red;
+            width: 0;
+            height: 0;
+        }
     }
     .sinterList {
         position: absolute;

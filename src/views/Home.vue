@@ -8,7 +8,7 @@
                     <i></i>
                 </span>
                 <h4 class="projectName">音悦台</h4>
-                <span class="searchBtn"></span>
+                <span class="searchBtn" v-on:click="search"></span>
             </div>
             <nav>
                 <div v-for="(item, index) in navList" v-bind:class="`navItem${activeNavIndex === index ? ' active' : ''}`" v-bind:key="index"><span v-on:click="setActiveNav(index)">{{item.name}}</span></div>
@@ -31,7 +31,6 @@ export default {
     },
     data: function () {
         return {
-            msg: 'home',
             activeNavIndex: 0,
             navList: [{
                 name: '推荐'
@@ -49,7 +48,31 @@ export default {
             this.$router.push({
                 path
             })
+        },
+        computeActiveNaxIndex: function () {
+            // this.activeNavIndex
+            switch (this.$route.path) {
+            case '':
+            case '/':
+            case '/home':
+                this.activeNavIndex = 0
+                break
+            case '/home/singer':
+                this.activeNavIndex = 1
+                break
+            case '/home/rank':
+                this.activeNavIndex = 2
+                break
+            }
+        },
+        search: function () {
+            this.$router.push({
+                path: '/search'
+            })
         }
+    },
+    mounted: function () {
+        this.computeActiveNaxIndex()
     }
 }
 </script>

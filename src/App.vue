@@ -7,9 +7,7 @@
                 <span></span>
             </div>
         </transition>
-        <div class="playerContainer">
-            <player ref="player"></player>
-        </div>
+        <player ref="player"></player>
     </div>
 </template>
 <script>
@@ -126,14 +124,6 @@ html, body {
                 animation: flash02 linear 2s infinite;
             }
         }
-    }
-    .playerContainer {
-        position: absolute;
-        height: rem(136);
-        left: 0;
-        bottom: 0;
-        right: 0;
-        box-shadow: 0 rem(-5) rem(15) rgba(0, 0, 0, 0.1);
     }
 }
 * {

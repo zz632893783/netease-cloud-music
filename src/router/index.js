@@ -7,6 +7,7 @@ import songListDetail from '../views/songListDetail'
 import singer from '../views/singer'
 import rank from '../views/rank'
 import singerDetail from '../views/singerDetail'
+import search from '../views/search'
 
 Vue.use(VueRouter)
 
@@ -39,6 +40,10 @@ const routes = [{
     path: '/singerDetail',
     name: 'singerDetail',
     component: singerDetail
+}, {
+    path: '/search',
+    name: 'search',
+    component: search
 }]
 
 const router = new VueRouter({
