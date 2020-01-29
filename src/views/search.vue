@@ -2,15 +2,18 @@
     <div class="search">
         <div class="inputBox">
             <span class="backBtn" v-on:click="back"></span>
-            <input class="keywords" v-model="keywords" placeholder="请输入搜索关键词" />
-            <span class="clearBtn" v-on:click="keywords = ''" v-show="keywords"></span>
+            <input class="keywords" v-model="queryBody.keywords" placeholder="请输入搜索关键词" />
+            <span class="clearBtn" v-on:click="queryBody.keywords = ''" v-show="queryBody.keywords"></span>
         </div>
         <div class="container">
-            <div class="hotSeach">
+            <div class="hotSeach" v-show="!queryBody.keywords && !searchResult.length">
                 <h4 class="title">热门搜索</h4>
-                <div class="item" v-for="(item, index) in hotSeach" v-bind:key="index">
+                <div class="item" v-for="(item, index) in hotSeach" v-bind:key="index" v-on:click="search(item.first)">
                     {{item.first}}
                 </div>
+            </div>
+            <div class="empty" v-show="queryBody.keywords && !searchResult.length">
+                未找到任何歌曲或歌单
             </div>
         </div>
     </div>
@@ -20,8 +23,11 @@ import commonRequest from '@/api/commonRequest.js'
 export default {
     data: function () {
         return {
-            keywords: '',
-            hotSeach: []
+            queryBody: {
+                keywords: ''
+            },
+            hotSeach: [],
+            searchResult: []
         }
     },
     methods: {
@@ -40,6 +46,34 @@ export default {
         },
         back: function () {
             this.$router.back()
+        },
+        search: function (keywords) {
+            this.queryBody.keywords = keywords
+            // type: 搜索类型；默认为 1 即单曲 , 取值意义 :
+            // 1: 单曲
+            // 10: 专辑
+            // 100: 歌手
+            // 1000: 歌单
+            // 1002: 用户
+            // 1004: MV
+            // 1006: 歌词
+            // 1009: 电台
+            // 1014: 视频
+            // 1018:综合
+            let requestBody = {
+                keywords: this.queryBody.keywords
+            }
+            this.$store.commit('setLoading', 1)
+            commonRequest('/search', requestBody).then(res => {
+                this.$store.commit('setLoading', -1)
+                if (res.status === 200) {
+                    // this.hotSeach = res.data.result.hots
+                    console.log(res)
+                }
+            }).catch(error => {
+                this.$store.commit('setLoading', -1)
+                console.log(error)
+            })
         }
     },
     mounted: function () {
@@ -149,6 +183,12 @@ export default {
                 margin-right: rem(40);
                 margin-bottom: rem(20);
             }
+        }
+        .empty {
+            font-size: rem(28);
+            color: #2c3e50;
+            text-align: center;
+            line-height: rem(200);
         }
     }
 }
