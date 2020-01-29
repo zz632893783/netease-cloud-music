@@ -1,13 +1,13 @@
 <template>
     <div class="singerDetail">
         <div class="topBar">
-            <span class="backBtn"></span>
+            <span class="backBtn" v-on:click="back"></span>
             <h4 class="sinterName">{{sinterName}}</h4>
         </div>
         <div class="container" ref="container" v-on:scroll="scrollFunc">
             <div class="sinterInfo" ref="sinterInfo">
                 <div class="bg" v-bind:style="`background-image: url(${cover});`"></div>
-                <span class="collectionBtn">
+                <span class="collectionBtn" ref="collectionBtn">
                     <label></label>
                     <span>收&nbsp;藏</span>
                 </span>
@@ -63,6 +63,13 @@ export default {
         },
         scrollFunc: function () {
             this.flag = this.$refs.container.scrollTop + window.innerHeight >= this.$refs.sinterInfo.offsetHeight + this.$refs.hotSongs.offsetHeight
+            let temp = this.$refs.sinterInfo.offsetHeight / 2
+            temp = (temp - this.$refs.container.scrollTop) / temp
+            temp = temp < 0 ? 0 : temp
+            this.$refs.collectionBtn.style.opacity = temp
+        },
+        back: function () {
+            this.$router.back()
         }
     },
     mounted: function () {
@@ -99,10 +106,10 @@ export default {
                 left: 50%;
                 top: 50%;
                 transform: translate(-50%, -50%) rotate(-45deg);
-                width: rem(30);
-                height: rem(30);
-                border-top: rem(2) solid white;
-                border-left: rem(2) solid white;
+                width: rem(30 - 4);
+                height: rem(30 - 4);
+                border-top: rem(3) solid white;
+                border-left: rem(3) solid white;
             }
         }
         .sinterName {
