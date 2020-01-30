@@ -170,8 +170,6 @@ export default {
             }
         }
         &::-webkit-scrollbar {
-            // opacity: 0;
-            // background-color: red;
             width: 0;
             height: 0;
         }
