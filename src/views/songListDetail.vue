@@ -19,19 +19,19 @@
                     <p class="description">{{listBaseInfo.description}}</p>
                 </div>
                 <ul class="options">
-                    <li class="optionItem">
+                    <li class="optionItem" v-on:click="clickComment">
                         <i class="icon"></i>
                         <span class="num">{{listBaseInfo.commentCount}}</span>
                     </li>
-                    <li class="optionItem">
+                    <li class="optionItem" v-on:click="clickShare">
                         <i class="icon"></i>
                         <span class="num">{{listBaseInfo.shareCount}}</span>
                     </li>
-                    <li class="optionItem">
+                    <li class="optionItem" v-on:click="clickCollection">
                         <i class="icon"></i>
                         <span class="text">收藏</span>
                     </li>
-                    <li class="optionItem">
+                    <li class="optionItem" v-on:click="clickMore">
                         <i class="icon"></i>
                         <span class="text">更多</span>
                     </li>
@@ -136,6 +136,18 @@ export default {
             this.$parent.$refs.player.getMusicDetail(obj.id)
             this.$parent.$refs.player.getSongURL(obj.id)
             // this.$parent.$refs.player.setStatus('pause')
+        },
+        clickComment: function () {
+            return alert('评论功能尚未开发完成')
+        },
+        clickShare: function () {
+            return alert('分享功能尚未开发完成')
+        },
+        clickCollection: function () {
+            return alert('收藏功能尚未开发完成')
+        },
+        clickMore: function () {
+            return alert('更多功能尚未开发完成')
         }
     },
     mounted: function () {

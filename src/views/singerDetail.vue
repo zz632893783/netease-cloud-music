@@ -7,7 +7,7 @@
         <div class="container" ref="container" v-on:scroll="scrollFunc">
             <div class="sinterInfo" ref="sinterInfo">
                 <div class="bg" v-bind:style="`background-image: url(${cover});`"></div>
-                <span class="collectionBtn" ref="collectionBtn">
+                <span class="collectionBtn" ref="collectionBtn" v-on:click="collectionSinger">
                     <label></label>
                     <span>收&nbsp;藏</span>
                 </span>
@@ -74,6 +74,9 @@ export default {
         playMusic: function (obj) {
             this.$parent.$refs.player.getMusicDetail(obj.id)
             this.$parent.$refs.player.getSongURL(obj.id)
+        },
+        collectionSinger: function () {
+            return alert('收藏功能尚在开发中')
         }
     },
     mounted: function () {

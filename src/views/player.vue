@@ -16,11 +16,11 @@
         <div class="songContainer" ref="songContainer" v-bind:style="`pointer-events: ${showSongList ? 'auto' : 'none'};`" v-on:click="setSongListShowState(false)">
             <div class="songList" ref="songList" v-bind:style="computeSongListSize()" v-on:click.stop>
                 <div class="controlBar">
-                    <span class="btn" v-on:click="changeMode">
+                    <span v-bind:class="`btn ${['loop', 'single', 'random'][mode]}`" v-on:click="changeMode">
                         <i></i>
                         <label>{{['顺序播放', '单曲循环', '随机播放'][mode]}}</label>
                     </span>
-                    <span class="deleteBtn"></span>
+                    <span class="deleteBtn" v-on:click="removeAllSong"></span>
                 </div>
                 <div class="songs">
                     <div class="item" v-for="(item, index) in songList" v-bind:key="index" v-on:click="getSongURL(item.id)">
@@ -30,8 +30,8 @@
                             <i></i>
                             <span class="artist">{{(item.artist || []).join('/')}}</span>
                         </div>
-                        <span class="enjoyBtn"></span>
-                        <span class="deleteBtn"></span>
+                        <span v-bind:class="`enjoyBtn ${item.enjoy ? 'active' : ''}`" v-on:click="enjoySong(item)"></span>
+                        <span class="deleteBtn" v-on:click="removeSong(index)"></span>
                     </div>
                     <span class="empty" v-if="!songList.length">
                         还未添加任何歌曲
@@ -54,7 +54,7 @@
                 <span class="duration">{{computeSecondToString(duration)}}</span>
             </div>
             <div class="control">
-                <span class="playModeBtn" v-on:click="changeMode"></span>
+                <span v-bind:class="`playModeBtn ${['loop', 'single', 'random'][mode]}`" v-on:click="changeMode"></span>
                 <span class="prevBtn" v-on:click="prev"></span>
                 <span v-bind:class="`playBtn ${status}`" v-on:click="clickPlayerBtn"></span>
                 <span class="nextBtn" v-on:click="next"></span>
@@ -99,6 +99,7 @@ export default {
             this.status = status
         },
         addSong: function (song) {
+            song.enjoy = false
             this.songList.unshift(song)
         },
         getSongURL: function (id) {
@@ -188,7 +189,8 @@ export default {
                             id: res.data.songs[0].id,
                             name: res.data.songs[0].name,
                             artist: res.data.songs[0].ar.map(item => item.name),
-                            coverUrl: res.data.songs[0].al.picUrl
+                            coverUrl: res.data.songs[0].al.picUrl,
+                            enjoy: false
                         })
                     }
                 }
@@ -320,6 +322,16 @@ export default {
         },
         changeMode: function () {
             this.mode = (this.mode + 1) % 3
+        },
+        removeAllSong: function () {
+            confirm('确认移除所有?') && (this.songList = [])
+        },
+        removeSong: function (index) {
+            this.songList.splice(index, 1)
+        },
+        enjoySong: function (song) {
+            song.enjoy = !song.enjoy
+            console.log(song)
         }
     },
     mounted: function () {
@@ -515,9 +527,24 @@ export default {
                         display: inline-block;
                         width: rem(30);
                         height: rem(30);
-                        border: 1px solid;
                         margin-right: rem(22);
                         margin-left: rem(40);
+                        background-size: 100% 100%;
+                    }
+                    &.loop {
+                        i {
+                            background-image: url('~@/assets/img/loop.png');
+                        }
+                    }
+                    &.single {
+                        i {
+                            background-image: url('~@/assets/img/single.png');
+                        }
+                    }
+                    &.random {
+                        i {
+                            background-image: url('~@/assets/img/random.png');
+                        }
                     }
                     label {
                         font-size: rem(28);
@@ -531,7 +558,8 @@ export default {
                     transform: translate(0, -50%);
                     width: rem(25);
                     height: rem(29);
-                    border: 1px solid;
+                    background-size: 100% 100%;
+                    background-image: url('~@/assets/img/delete.png');
                 }
             }
             .songs {
@@ -556,17 +584,8 @@ export default {
                         top: 50%;
                         transform: translate(0, -50%);
                         border: rem(2) solid #d44339;
-                        &:before {
-                            content: '';
-                            position: absolute;
-                            left: 50%;
-                            top: 50%;
-                            transform: translate(-50%, -50%);
-                            border-top: rem(5) solid transparent;
-                            border-right: 0 solid;
-                            border-bottom: rem(5) solid transparent;
-                            border-left: rem(8) solid #d44339;
-                        }
+                        background-size: 100% 100%;
+                        background-image: url('~@/assets/img/playRedFull.png');
                     }
                     .song {
                         font-size: 0;
@@ -598,7 +617,11 @@ export default {
                         right: rem(122);
                         top: 50%;
                         transform: translate(0, -50%);
-                        border: 1px solid;
+                        background-size: 100% 100%;
+                        background-image: url('~@/assets/img/heat.png');
+                        &.active {
+                            background-image: url('~@/assets/img/heatFull.png');
+                        }
                     }
                     .deleteBtn {
                         position: absolute;
@@ -607,7 +630,8 @@ export default {
                         right: rem(62);
                         top: 50%;
                         transform: translate(0, -50%);
-                        border: 1px solid;
+                        background-size: 100% 100%;
+                        background-image: url('~@/assets/img/delete.png');
                     }
                 }
                 .empty {
@@ -763,36 +787,57 @@ export default {
                 display: inline-block;
                 width: rem(80);
                 height: rem(80);
-                border: 1px solid;
                 margin: 0 rem(76);
                 vertical-align: middle;
+                background-size: 100% 100%;
+                &.play {
+                    background-image: url('~@/assets/img/pauseRed.png');
+                }
+                &.pause {
+                    background-image: url('~@/assets/img/playRed.png');
+                }
             }
             .prevBtn, .nextBtn {
                 width: rem(46);
                 height: rem(53);
-                border: 1px solid;
+                // border: 1px solid;
                 display: inline-block;
                 vertical-align: middle;
+                background-size: 100% 100%;
             }
             .prevBtn {
                 margin-left: rem(87);
+                background-image: url('~@/assets/img/prev.png');
             }
             .nextBtn {
                 margin-right: rem(81);
+                background-image: url('~@/assets/img/next.png');
             }
             .playModeBtn {
                 width: rem(48);
                 height: rem(46);
-                border: 1px solid;
+                // border: 1px solid;
                 display: inline-block;
                 vertical-align: middle;
+                background-size: 100% 100%;
+                &.loop {
+                    background-image: url('~@/assets/img/loop.png');
+                }
+                &.single {
+                    background-image: url('~@/assets/img/single.png');
+                }
+                &.random {
+                    background-image: url('~@/assets/img/random.png');
+                }
             }
             .songListBtn {
                 width: rem(61);
                 height: rem(62);
-                border: 1px solid;
+                // border: 1px solid;
                 display: inline-block;
                 vertical-align: middle;
+                background-size: 100% 100%;
+                background-image: url('~@/assets/img/list.png');
             }
         }
     }
