@@ -111,6 +111,7 @@ export default {
                 this.$store.commit('setLoading', -1)
                 if (res.status === 200) {
                     if (!res.data.data[0].url) {
+                        this.next()
                         return alert('正在争取这首歌的版权')
                     }
                     this.musicUrl = res.data.data[0].url
