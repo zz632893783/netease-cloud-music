@@ -10,7 +10,7 @@
                 {{item.name}}
             </div>
         </div>
-        <div class="container" ref="container" v-bind:style="`top: ${computeContainerSize()}px;`">
+        <div class="container" ref="container" v-bind:style="`top: ${computeContainerSize()}px;`" v-on:scroll="scrollFunc">
             <div class="hotSeach" v-show="!queryBody.keywords && !searchResult.length">
                 <h4 class="title">热门搜索</h4>
                 <div class="item" v-for="(item, index) in hotSeach" v-bind:key="index" v-on:click="search(item.first)">
@@ -20,7 +20,7 @@
             <div class="empty" v-show="queryBody.keywords && !searchResult.length">
                 未找到任何结果
             </div>
-            <div class="searchResult">
+            <div class="searchResult" ref="searchResult">
                 <div class="song" v-if="queryBody.type == '1'">
                     <div class="item" v-for="(item, index) in searchResult" v-bind:key="index" v-on:click="selectSong(item)">
                         <h4 class="name">{{item.name}}</h4>
@@ -68,7 +68,12 @@
                 </div>
                 <div class="videos" v-if="queryBody.type == '1014'">
                     <div class="item" v-for="(item, index) in searchResult" v-bind:key="index" v-on:click="selectVideo(item)">
-                        <div class="cover" v-bind:style="`background-image: url(${item.coverUrl});`"></div>
+                        <div class="cover" v-bind:style="`background-image: url(${item.coverUrl});`">
+                            <span class="playCount">
+                                <i></i>
+                                <label>{{computeCount(item.playTime)}}</label>
+                            </span>
+                        </div>
                         <div class="info">
                             <h4 class="name"><span class="mv" v-if="item.type == 0">MV</span>{{item.title}}</h4>
                             <div class="row">
@@ -104,6 +109,9 @@
                         </div>
                         <span class="btn"><i></i>关注</span>
                     </div>
+                </div>
+                <div class="end" v-show="queryBody.keywords && searchResult.length">
+                    已经到底啦
                 </div>
             </div>
         </div>
@@ -382,6 +390,23 @@ export default {
             return {
                 height
             }
+        },
+        scrollFunc: function () {
+            let height = this.$refs.container.offsetHeight + this.$refs.container.scrollTop
+            let temp = 0
+            let list = [...this.$refs.searchResult.children]
+            list.forEach(item => {
+                temp = temp + item.offsetHeight
+            })
+            if (height >= temp && this.searchResult.length < this.count) {
+                this.queryBody.offset = this.searchResult.length
+                this.search(this.queryBody.keywords)
+            }
+            // this.flag = this.$refs.container.scrollTop + window.innerHeight >= this.$refs.sinterInfo.offsetHeight + this.$refs.hotSongs.offsetHeight
+            // let temp = this.$refs.sinterInfo.offsetHeight / 2
+            // temp = (temp - this.$refs.container.scrollTop) / temp
+            // temp = temp < 0 ? 0 : temp
+            // this.$refs.collectionBtn.style.opacity = temp
         }
     },
     mounted: function () {
@@ -721,6 +746,30 @@ export default {
                         background-position: 50% 50%;
                         vertical-align: middle;
                         margin-left: rem(32);
+                        position: relative;
+                        .playCount {
+                            position: absolute;
+                            top: rem(9);
+                            right: rem(15);
+                            font-size: 0;
+                            line-height: rem(20);
+                            i {
+                                display: inline-block;
+                                width: rem(16);
+                                height: rem(20);
+                                background-image: url('~@/assets/img/play.png');
+                                background-size: 100% 100%;
+                                vertical-align: middle;
+                                margin-right: rem(9);
+                            }
+                            label {
+                                font-size: rem(24);
+                                color: white;
+                                display: inline-block;
+                                line-height: rem(20);
+                                vertical-align: middle;
+                            }
+                        }
                     }
                     .info {
                         display: inline-block;
