@@ -16,7 +16,7 @@
         <div class="songContainer" ref="songContainer" v-bind:style="`pointer-events: ${showSongList ? 'auto' : 'none'};`" v-on:click="setSongListShowState(false)">
             <div class="songList" ref="songList" v-bind:style="computeSongListSize()" v-on:click.stop>
                 <div class="controlBar">
-                    <span class="btn">
+                    <span class="btn" v-on:click="changeMode">
                         <i></i>
                         <label>{{['顺序播放', '单曲循环', '随机播放'][mode]}}</label>
                     </span>
@@ -39,7 +39,28 @@
                 </div>
             </div>
         </div>
-        <div class="playerDetail" v-bind:style="computePlayerDetailSize()"></div>
+        <div class="playerDetail" v-bind:style="computePlayerDetailSize()" v-on:touchmove="touchmoveFunc" v-on:touchend="touchendFunc">
+            <span class="closeBtn" v-on:click="showPlayerDetail = false"></span>
+            <div class="bg" v-bind:style="`background-image: url(${(songList.find(item => item.id === activeSongId) || {}).coverUrl || ''}); height: ${windowHeight * 1.4}px;`"></div>
+            <h3 class="title">{{(songList.find(item => item.id == activeSongId) || {}).name}}</h3>
+            <p class="artist">{{((songList.find(item => item.id == activeSongId) || {}).artist || []).join('/')}}</p>
+            <div class="cover" v-bind:style="`background-image: url(${(songList.find(item => item.id == activeSongId) || {}).coverUrl});`"></div>
+            <div class="progress" ref="playProgress" v-on:touchend="progressTouchEndFunc">
+                <span class="currentTime">{{computeSecondToString(currentTime)}}</span>
+                <div class="bar" ref="bar" v-bind:style="computeProgressBarStyle()"></div>
+                <span class="dot" ref="dot" v-on:touchstart="touchstartFunc">
+                    <i></i>
+                </span>
+                <span class="duration">{{computeSecondToString(duration)}}</span>
+            </div>
+            <div class="control">
+                <span class="playModeBtn" v-on:click="changeMode"></span>
+                <span class="prevBtn" v-on:click="prev"></span>
+                <span v-bind:class="`playBtn ${status}`" v-on:click="clickPlayerBtn"></span>
+                <span class="nextBtn" v-on:click="next"></span>
+                <span class="songListBtn" v-on:click="setSongListShowState(true)"></span>
+            </div>
+        </div>
     </div>
 </template>
 <script>
@@ -47,12 +68,14 @@ import commonRequest from '@/api/commonRequest.js'
 export default {
     data: function () {
         return {
+            windowHeight: window.innerHeight,
             msg: 'player',
             musicUrl: '',
             status: 'pause',
             loadFinish: false,
             // status: 'play',
             timer: null,
+            currentTime: 0,
             duration: 0,
             canvasSize: 0,
             ctx: null,
@@ -65,7 +88,10 @@ export default {
             // 0表示循环，1表示单曲循环，2表示随机
             mode: 0,
             activeSongId: '',
-            songList: []
+            songList: [],
+            touchDotEnable: false,
+            screenX: 0,
+            prevLeft: 0
         }
     },
     methods: {
@@ -114,6 +140,12 @@ export default {
             this.timer && (clearInterval(this.timer))
             this.timer = setInterval(() => {
                 this.draw()
+                if (!this.touchDotEnable) {
+                    this.currentTime = this.$refs.audio.currentTime
+                    this.$refs.dot.style.left = `${(this.currentTime / this.duration * 100)}%`
+                } else {
+                    // console.log('此处也是用拖动数据')
+                }
             }, 100)
         },
         loadFunc: function () {
@@ -176,14 +208,118 @@ export default {
             this.$refs.songContainer.style.backgroundColor = `rgba(0, 0, 0, ${val ? 0.3 : 0})`
         },
         setPlayerShowStatue: function (val) {
-            // console.log('setPlayerShowStatue', val)
+            // console.log(2333)
             this.showPlayerDetail = val
         },
         computePlayerDetailSize: function () {
-            let top = this.showPlayerDetail ? 0 : window.innerHeight
+            let top = (this.showPlayerDetail ? 0 : window.innerHeight)
             return {
                 top: `${top}px`
             }
+        },
+        computeSecondToString: function (val) {
+            let minute = parseInt(val / 60)
+            let second = parseInt(val % 60)
+            minute = minute === 0 ? '00' : (minute < 10 ? '0' + minute : minute)
+            second = second === 0 ? '00' : (second < 10 ? '0' + second : second)
+            return `${minute}:${second}`
+        },
+        computeProgressBarStyle: function () {
+            if (!this.touchDotEnable) {
+                return {
+                    width: `${this.currentTime / this.duration * 100}%`
+                }
+            } else {
+                // console.log('此处使用拖动数据')
+                return {
+                    width: `${this.prevLeft}px`
+                }
+            }
+        },
+        touchstartFunc: function (event) {
+            this.screenX = event.touches[0].screenX
+            this.touchDotEnable = true
+            this.prevLeft = parseFloat(window.getComputedStyle(this.$refs.dot).left)
+            // this.$refs.bar.style.width = `${this.prevLeft}px`
+        },
+        touchmoveFunc: function (event) {
+            if (this.touchDotEnable) {
+                let temp = event.touches[0].screenX - this.screenX
+                temp = this.prevLeft + temp
+                let barWidth = this.$refs.playProgress.offsetWidth
+                if (temp < 0) {
+                    temp = 0
+                } else if (temp > barWidth) {
+                    temp = barWidth
+                }
+                this.$refs.dot.style.left = `${temp}px`
+                this.$refs.bar.style.width = `${temp}px`
+                this.currentTime = temp / barWidth * this.duration
+            }
+        },
+        touchendFunc: function () {
+            if (this.touchDotEnable) {
+                this.touchDotEnable = false
+                this.$refs.audio.currentTime = this.currentTime
+            }
+        },
+        progressTouchEndFunc: function (event) {
+            console.log(event)
+        },
+        playFinish: function () {
+            if (this.mode === 0 || this.mode === 2) {
+                this.next()
+            } else if (this.mode === 1) {
+                this.getSongURL(this.activeSongId)
+            }
+        },
+        prev: function () {
+            if (!this.songList.length) {
+                return alert('先添加些歌曲吧')
+            }
+            if (this.mode === 0 || this.mode === 1) {
+                let index = this.songList.findIndex(item => item.id === this.activeSongId)
+                if (index >= 0) {
+                    index = (index + this.songList.length - 1) % this.songList.length
+                    this.activeSongId = this.songList[index].id
+                    this.getSongURL(this.activeSongId)
+                }
+            } else {
+                let index = this.randomSongIndex()
+                this.activeSongId = this.songList[index].id
+                this.getSongURL(this.activeSongId)
+            }
+        },
+        next: function () {
+            if (!this.songList.length) {
+                return alert('先添加些歌曲吧')
+            }
+            if (this.mode === 0 || this.mode === 1) {
+                let index = this.songList.findIndex(item => item.id === this.activeSongId)
+                if (index >= 0) {
+                    index = (index + 1) % this.songList.length
+                    this.activeSongId = this.songList[index].id
+                    this.getSongURL(this.activeSongId)
+                }
+            } else {
+                let index = this.randomSongIndex()
+                this.activeSongId = this.songList[index].id
+                this.getSongURL(this.activeSongId)
+            }
+        },
+        randomSongIndex: function () {
+            if (this.songList.length === 1) {
+                return 0
+            }
+            let prevIndex = this.songList.findIndex(item => item.id === this.activeSongId)
+            let index = parseInt(Math.random() * this.songList.length)
+            while (index === prevIndex) {
+                index = parseInt(Math.random() * this.songList.length)
+            }
+            return index
+        },
+        changeMode: function () {
+            this.mode = (this.mode + 1) % 3
         }
     },
     mounted: function () {
@@ -194,8 +330,11 @@ export default {
         this.$refs.audio.addEventListener('canplay', () => {
             this.loadFinish = true
             this.status = 'pause'
-            // this.activeSongId =
+            this.duration = this.$refs.audio.duration
             this.clickPlayerBtn()
+        })
+        this.$refs.audio.addEventListener('ended', () => {
+            this.playFinish()
         })
     },
     beforeUpdate: function () {
@@ -352,6 +491,7 @@ export default {
         // pointer-events: auto;
         transition: background-color 0.5s;
         overflow: hidden;
+        z-index: 1;
         .songList {
             position: absolute;
             left: 0;
@@ -486,9 +626,175 @@ export default {
         left: 0;
         right: 0;
         bottom: 0;
-        border: 1px solid blue;
+        // border: 1px solid blue;
         pointer-events: auto;
         transition: top 0.5s;
+        overflow: hidden;
+        background-color: white;
+        .closeBtn {
+            position: absolute;
+            top: rem(30);
+            left: rem(30);
+            width: rem(60);
+            height: rem(60);
+            // border: 1px solid;
+            z-index: 2;
+            &:before {
+                content: '';
+                width: rem(30);
+                height: rem(30);
+                position: absolute;
+                border-top: rem(2) solid;
+                border-left: rem(2) solid;
+                left: 50%;
+                top: 30%;
+                transform: translate(-50%, -50%) rotate(-135deg);
+            }
+        }
+        .bg {
+            position: absolute;
+            // left: rem(-100);
+            // top: rem(-100);
+            // right: rem(-100);
+            // bottom: rem(-100);
+            // filter: blur(rem(20));
+            background-position: 50% 50%;
+            background-size: cover;
+            filter: blur(rem(30));
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: rem(1000);
+        }
+        .title {
+            line-height: rem(90);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: rem(700);
+            margin: 0 auto;
+            text-align: center;
+            font-size: rem(32);
+            position: relative;
+            z-index: 1;
+            color: #0b111a;
+            font-weight: 200;
+        }
+        .artist {
+            line-height: rem(26);
+            font-size: rem(28);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: rem(700);
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            color: rgba(0, 0, 0, 0.4);
+        }
+        .cover {
+            position: absolute;
+            width: rem(570);
+            height: rem(570);
+            background-size: cover;
+            background-position: 50% 50%;
+            border-radius: 50%;
+            left: 50%;
+            top: rem(240);
+            transform: translate(-50%, 0);
+        }
+        .progress {
+            position: absolute;
+            left: 50%;
+            bottom: rem(196);
+            width: rem(480);
+            height: rem(8);
+            transform: translate(-50%, 0);
+            background-color: rgba(255, 255, 255, 0.3);
+            .bar {
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: rem(8);
+                background-color: #d44339;
+            }
+            .dot {
+                width: 0;
+                height: 0;
+                position: absolute;
+                top: 50%;
+                transform: translate(0, -50%);
+                i {
+                    position: absolute;
+                    width: rem(16);
+                    height: rem(16);
+                    border-radius: 50%;
+                    background-color: white;
+                    position: absolute;
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                }
+            }
+            .currentTime, .duration {
+                position: absolute;
+                top: 50%;
+                font-size: rem(28);
+                color: rgba(0, 0, 0, 0.5);
+            }
+            .currentTime {
+                left: rem(-14);
+                transform: translate(-100%, -50%);
+            }
+            .duration {
+                right: rem(-14);
+                transform: translate(100%, -50%);
+            }
+        }
+        .control {
+            position: absolute;
+            white-space: nowrap;
+            bottom: rem(68);
+            white-space: nowrap;
+            text-align: center;
+            width: rem(750);
+            .playBtn {
+                display: inline-block;
+                width: rem(80);
+                height: rem(80);
+                border: 1px solid;
+                margin: 0 rem(76);
+                vertical-align: middle;
+            }
+            .prevBtn, .nextBtn {
+                width: rem(46);
+                height: rem(53);
+                border: 1px solid;
+                display: inline-block;
+                vertical-align: middle;
+            }
+            .prevBtn {
+                margin-left: rem(87);
+            }
+            .nextBtn {
+                margin-right: rem(81);
+            }
+            .playModeBtn {
+                width: rem(48);
+                height: rem(46);
+                border: 1px solid;
+                display: inline-block;
+                vertical-align: middle;
+            }
+            .songListBtn {
+                width: rem(61);
+                height: rem(62);
+                border: 1px solid;
+                display: inline-block;
+                vertical-align: middle;
+            }
+        }
     }
 }
 </style>
