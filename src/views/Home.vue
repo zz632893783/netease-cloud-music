@@ -2,7 +2,7 @@
     <div class="home">
         <div class="header">
             <div class="headRow">
-                <span class="menuBtn">
+                <span class="menuBtn" v-on:click="clickMenu">
                     <i></i>
                     <i></i>
                     <i></i>
@@ -69,6 +69,9 @@ export default {
             this.$router.push({
                 path: '/search'
             })
+        },
+        clickMenu: function () {
+            return alert('个人中心功能尚在开发中')
         }
     },
     mounted: function () {

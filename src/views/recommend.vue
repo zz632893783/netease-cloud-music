@@ -3,7 +3,7 @@
         <div class="recommendBanner">
             <div class="swiper-wrapper">
                 <div class="swiper-slide" v-for="(item, index) in bannerList" v-bind:key="index">
-                    <div class="cover" v-bind:style="`background-image: url(${item.imageUrl});`"></div>
+                    <div class="cover" v-bind:style="`background-image: url(${item.imageUrl});`" v-on:click="clickBannerItem(item)"></div>
                 </div>
             </div>
         </div>
@@ -77,6 +77,9 @@ export default {
                     id: item.id
                 }
             })
+        },
+        clickBannerItem: function (obj) {
+            return alert('首页轮播功能尚在开发中')
         }
     },
     mounted: function () {
