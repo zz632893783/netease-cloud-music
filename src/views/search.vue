@@ -46,7 +46,7 @@
                 </div>
                 <div class="singer" v-if="queryBody.type == '100'">
                     <div class="item" v-for="(item, index) in searchResult" v-bind:key="index" v-on:click="selectSinger(item)">
-                        <div class="avatar" v-bind:style="`background-image: url(${item.picUrl});`"></div>
+                        <div class="avatar" v-bind:style="`background-image: url(${item.picUrl || item.img1v1Url});`"></div>
                         <h4 class="name">
                             {{item.name}}
                             <label v-if="item.alia && item.alia.length">({{item.alia[0]}})</label>
@@ -110,7 +110,7 @@
                         <span class="btn"><i></i>关注</span>
                     </div>
                 </div>
-                <div class="end" v-show="queryBody.keywords && searchResult.length">
+                <div class="nomore" v-show="queryBody.keywords && searchResult.length">
                     已经到底啦
                 </div>
             </div>
@@ -255,6 +255,7 @@ export default {
         inputKeywords: function () {
             this.songCount = 0
             this.searchResult = []
+            this.queryBody.offset = 0
             if (!this.queryBody.keywords) {
                 return false
             }
@@ -266,12 +267,14 @@ export default {
         selectNav: function (obj) {
             this.queryBody.type = obj.code
             this.count = 0
+            this.queryBody.offset = 0
             this.searchResult = []
             this.search(this.queryBody.keywords)
         },
         clear: function () {
             this.songCount = 0
             this.searchResult = []
+            this.queryBody.offset = 0
             this.queryBody.keywords = ''
         },
         selectSong: function (obj) {
@@ -1017,6 +1020,13 @@ export default {
                         }
                     }
                 }
+            }
+            .nomore {
+                display: block;
+                text-align: center;
+                line-height: rem(120);
+                font-size: rem(30);
+                color: #999999;
             }
         }
     }
