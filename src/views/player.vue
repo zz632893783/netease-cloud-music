@@ -3,17 +3,17 @@
         <div class="container"></div>
         <audio ref="audio" v-bind:src="musicUrl"></audio>
         <div class="preview">
-            <div v-bind:class="`cover ${status}`" v-bind:style="`background-image: url(${coverUrl});`" v-on:click="setPlayerShowStatue(true)"></div>
+            <div v-bind:class="`cover ${status}`" v-bind:style="`background-image: url(${(songList.find(item => item.id == activeSongId) || {}).coverUrl});`" v-on:click="setPlayerShowStatue(true)"></div>
             <div class="info" v-on:click="setPlayerShowStatue(true)">
-                <p class="name">{{songName}}</p>
-                <p class="singer">{{artist}}</p>
+                <p class="name">{{(songList.find(item => item.id == activeSongId) || {}).name}}</p>
+                <p class="singer">{{((songList.find(item => item.id == activeSongId) || {}).artist || []).join('/')}}</p>
             </div>
             <span v-bind:class="`btn ${status}`" v-on:click="clickPlayerBtn">
                 <canvas v-bind:width="canvasSize" v-bind:height="canvasSize" ref="progress"></canvas>
             </span>
             <div class="songList" v-on:click="setSongListShowState(true)"></div>
         </div>
-        <span class="songContainer" ref="songContainer" v-bind:style="`pointer-events: ${showSongList ? 'auto' : 'none'};`" v-on:click="setSongListShowState(false)">
+        <div class="songContainer" ref="songContainer" v-bind:style="`pointer-events: ${showSongList ? 'auto' : 'none'};`" v-on:click="setSongListShowState(false)">
             <div class="songList" ref="songList" v-bind:style="computeSongListSize()" v-on:click.stop>
                 <div class="controlBar">
                     <span class="btn">
@@ -23,19 +23,23 @@
                     <span class="deleteBtn"></span>
                 </div>
                 <div class="songs">
-                    <div class="item" v-for="(item, index) in songList" v-bind:key="index">
+                    <div class="item" v-for="(item, index) in songList" v-bind:key="index" v-on:click="getSongURL(item.id)">
                         <span class="play" v-show="activeSongId == item.id"></span>
                         <div class="song">
                             <span class="name">{{item.name}}</span>
                             <i></i>
-                            <span class="artist">{{item.artist}}</span>
+                            <span class="artist">{{(item.artist || []).join('/')}}</span>
                         </div>
                         <span class="enjoyBtn"></span>
                         <span class="deleteBtn"></span>
                     </div>
+                    <span class="empty" v-if="!songList.length">
+                        还未添加任何歌曲
+                    </span>
                 </div>
             </div>
-        </span>
+        </div>
+        <div class="playerDetail" v-bind:style="computePlayerDetailSize()"></div>
     </div>
 </template>
 <script>
@@ -52,75 +56,24 @@ export default {
             duration: 0,
             canvasSize: 0,
             ctx: null,
-            coverUrl: '',
-            songName: '',
-            artist: '',
+            // coverUrl: '',
+            // songName: '',
+            // artist: '',
             show: true,
             showSongList: false,
+            showPlayerDetail: false,
             // 0表示循环，1表示单曲循环，2表示随机
             mode: 0,
-            activeSongId: '1',
-            songList: [{
-                name: '富士山下',
-                id: '1',
-                artist: '陈奕迅',
-                coverUrl: ''
-            }, {
-                name: '富士山下',
-                id: '2',
-                artist: '陈奕迅',
-                coverUrl: ''
-            }, {
-                name: '富士山下',
-                id: '3',
-                artist: '陈奕迅',
-                coverUrl: ''
-            }, {
-                name: '富士山下',
-                id: '4',
-                artist: '陈奕迅',
-                coverUrl: ''
-            }, {
-                name: '富士山下',
-                id: '',
-                artist: '陈奕迅',
-                coverUrl: ''
-            }, {
-                name: '富士山下',
-                id: '',
-                artist: '陈奕迅',
-                coverUrl: ''
-            }, {
-                name: '富士山下',
-                id: '',
-                artist: '陈奕迅',
-                coverUrl: ''
-            }, {
-                name: '富士山下',
-                id: '',
-                artist: '陈奕迅',
-                coverUrl: ''
-            }, {
-                name: '富士山下',
-                id: '',
-                artist: '陈奕迅',
-                coverUrl: ''
-            }, {
-                name: '富士山下',
-                id: '',
-                artist: '陈奕迅',
-                coverUrl: ''
-            }, {
-                name: '富士山下',
-                id: '',
-                artist: '陈奕迅',
-                coverUrl: ''
-            }]
+            activeSongId: '',
+            songList: []
         }
     },
     methods: {
         setStatus: function (status) {
             this.status = status
+        },
+        addSong: function (song) {
+            this.songList.unshift(song)
         },
         getSongURL: function (id) {
             let requestBody = {
@@ -128,9 +81,13 @@ export default {
             }
             this.$store.commit('setLoading', 1)
             commonRequest('/song/url', requestBody).then(res => {
+                this.$store.commit('setLoading', -1)
                 if (res.status === 200) {
-                    this.$store.commit('setLoading', -1)
+                    if (!res.data.data[0].url) {
+                        return alert('正在争取这首歌的版权')
+                    }
                     this.musicUrl = res.data.data[0].url
+                    this.activeSongId = id
                 }
             }).catch(error => {
                 this.$store.commit('setLoading', -1)
@@ -187,9 +144,21 @@ export default {
             commonRequest('/song/detail', requestBody).then(res => {
                 if (res.status === 200) {
                     this.$store.commit('setLoading', -1)
-                    this.coverUrl = res.data.songs[0].al.picUrl
-                    this.songName = res.data.songs[0].name
-                    this.artist = res.data.songs[0].ar.map(item => item.name).join(',')
+                    // if (!res.data.songs[0].url) {
+                    //     return alert('正在争取这首歌的版权233')
+                    // }
+                    // this.coverUrl = res.data.songs[0].al.picUrl
+                    // this.songName = res.data.songs[0].name
+                    // this.artist = res.data.songs[0].ar.map(item => item.name).join(',')
+                    let temp = this.songList.find(item => item.id === res.data.songs[0].id)
+                    if (!temp) {
+                        this.songList.push({
+                            id: res.data.songs[0].id,
+                            name: res.data.songs[0].name,
+                            artist: res.data.songs[0].ar.map(item => item.name),
+                            coverUrl: res.data.songs[0].al.picUrl
+                        })
+                    }
                 }
             }).catch(error => {
                 this.$store.commit('setLoading', -1)
@@ -206,7 +175,16 @@ export default {
             this.showSongList = val
             this.$refs.songContainer.style.backgroundColor = `rgba(0, 0, 0, ${val ? 0.3 : 0})`
         },
-        setPlayerShowStatue: function (val) {}
+        setPlayerShowStatue: function (val) {
+            // console.log('setPlayerShowStatue', val)
+            this.showPlayerDetail = val
+        },
+        computePlayerDetailSize: function () {
+            let top = this.showPlayerDetail ? 0 : window.innerHeight
+            return {
+                top: `${top}px`
+            }
+        }
     },
     mounted: function () {
         this.show = this.$route.path !== '/search'
@@ -216,6 +194,7 @@ export default {
         this.$refs.audio.addEventListener('canplay', () => {
             this.loadFinish = true
             this.status = 'pause'
+            // this.activeSongId =
             this.clickPlayerBtn()
         })
     },
@@ -491,8 +470,25 @@ export default {
                         border: 1px solid;
                     }
                 }
+                .empty {
+                    position: absolute;
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                    white-space: nowrap;
+                    font-size: rem(28);
+                }
             }
         }
+    }
+    .playerDetail {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 1px solid blue;
+        pointer-events: auto;
+        transition: top 0.5s;
     }
 }
 </style>
