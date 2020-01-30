@@ -12,7 +12,7 @@ import search from '../views/search'
 Vue.use(VueRouter)
 
 const routes = [{
-    path: '/home',
+    path: '/',
     name: 'home',
     component: home,
     children: [{

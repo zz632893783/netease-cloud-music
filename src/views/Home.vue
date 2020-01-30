@@ -44,7 +44,7 @@ export default {
     methods: {
         setActiveNav: function (index) {
             this.activeNavIndex = index
-            let path = ['/home', '/home/singer', '/home/rank'][index]
+            let path = ['/', '/singer', '/rank'][index]
             this.$router.push({
                 path
             })
@@ -54,13 +54,12 @@ export default {
             switch (this.$route.path) {
             case '':
             case '/':
-            case '/home':
                 this.activeNavIndex = 0
                 break
-            case '/home/singer':
+            case '/singer':
                 this.activeNavIndex = 1
                 break
-            case '/home/rank':
+            case '/rank':
                 this.activeNavIndex = 2
                 break
             }

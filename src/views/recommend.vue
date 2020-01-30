@@ -56,7 +56,6 @@ export default {
             commonRequest('/recommend/resource', requestBody).then(res => {
                 if (res.status === 200) {
                     this.$store.commit('setLoading', -1)
-                    // this.list = res.data.result
                     this.list = res.data.recommend
                 }
             }).catch(error => {

@@ -39,17 +39,22 @@ export default {
             }
             this.$store.commit('setLoading', 1)
             commonRequest('/login/cellphone', requestBody).then(res => {
+                this.$store.commit('setLoading', -1)
                 if (res.status === 200) {
-                    this.$store.commit('setLoading', -1)
-                    setCookie('token', res.data.token)
-                    setCookie('userId', res.data.userId)
-                    setCookie('nickname', res.data.nickname)
-                    this.$router.push({
-                        path: '/home'
-                    })
+                    if (res.data.code === 200) {
+                        setCookie('token', res.data.token)
+                        setCookie('userId', res.data.userId)
+                        setCookie('nickname', res.data.nickname)
+                        this.$router.push({
+                            path: '/'
+                        })
+                    } else {
+                        alert('用户名或密码错误')
+                    }
                 }
             }).catch(error => {
                 this.$store.commit('setLoading', -1)
+                /* eslint-disable */
                 console.log(error)
             })
         },

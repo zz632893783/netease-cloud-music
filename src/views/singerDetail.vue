@@ -281,7 +281,7 @@ export default {
                         white-space: nowrap;
                         color: #6e6c6d;
                         line-height: normal;
-                        line-height: rem(22);
+                        line-height: rem(24);
                     }
                 }
             }

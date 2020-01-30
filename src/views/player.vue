@@ -2,7 +2,7 @@
     <div class="player" v-show="show">
         <div class="container"></div>
         <audio ref="audio" v-bind:src="musicUrl"></audio>
-        <div class="preview">
+        <div v-bind:class="`preview ${songList.length ? 'show' : ''}`">
             <div v-bind:class="`cover ${status}`" v-bind:style="`background-image: url(${(songList.find(item => item.id == activeSongId) || {}).coverUrl});`" v-on:click="setPlayerShowStatue(true)"></div>
             <div class="info" v-on:click="setPlayerShowStatue(true)">
                 <p class="name">{{(songList.find(item => item.id == activeSongId) || {}).name}}</p>
@@ -332,7 +332,6 @@ export default {
         },
         enjoySong: function (song) {
             song.enjoy = !song.enjoy
-            console.log(song)
         }
     },
     mounted: function () {
@@ -340,7 +339,7 @@ export default {
         this.setTimer()
         this.computeCanvasSize()
         this.ctx = this.$refs.progress.getContext('2d')
-        this.$refs.audio.addEventListener('canplay', () => {
+        this.$refs.audio.addEventListener('loadedmetadata', () => {
             this.loadFinish = true
             this.status = 'pause'
             this.duration = this.$refs.audio.duration
@@ -388,12 +387,16 @@ export default {
         left: 0;
         right: 0;
         // top: 0;
-        bottom: 0;
+        bottom: rem(-136);
         background-color: white;
         line-height: rem(136);
         height: rem(136);
         pointer-events: auto;
         box-shadow: 0 rem(-5) rem(15) rgba(0, 0, 0, 0.1);
+        transition: bottom 0.3s;
+        &.show {
+            bottom: rem(0);
+        }
         .cover {
             display: inline-block;
             width: rem(82);
@@ -614,7 +617,7 @@ export default {
                     .enjoyBtn {
                         position: absolute;
                         width: rem(30);
-                        height: rem(26);
+                        height: rem(30);
                         right: rem(122);
                         top: 50%;
                         transform: translate(0, -50%);
